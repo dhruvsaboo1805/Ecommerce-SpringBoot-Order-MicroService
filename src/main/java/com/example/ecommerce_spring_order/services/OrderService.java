@@ -7,6 +7,7 @@ import com.example.ecommerce_spring_order.dto.OrderRequestDTO;
 import com.example.ecommerce_spring_order.dto.ProductDTO;
 import com.example.ecommerce_spring_order.entity.Order;
 import com.example.ecommerce_spring_order.entity.OrderItems;
+import com.example.ecommerce_spring_order.enums.OrderStatus;
 import com.example.ecommerce_spring_order.mapper.OrderItemMapper;
 import com.example.ecommerce_spring_order.mapper.OrderMapper;
 import com.example.ecommerce_spring_order.repository.IOrderRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderService implements IOrderService {
@@ -51,5 +53,18 @@ public class OrderService implements IOrderService {
         order.setItems(order_items);
         Order final_created_order = orderRepository.save(order);
         return OrderMapper.toDto(final_created_order);
+    }
+
+    @Override
+    public CreateOrderRequestDTO updateStatus(Long orderId) throws Exception {
+        // 1. Find the entity or throw a clear exception
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new Exception("Order not found with id: " + orderId));
+
+        order.setStatus(OrderStatus.COMPLETED);
+
+        Order updatedOrder = orderRepository.save(order);
+        return OrderMapper.toDto(updatedOrder);
+
     }
 }
